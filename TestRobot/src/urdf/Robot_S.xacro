@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- 里程计（odom）模块：在底盘正下方的地面位置放一个扁平标记，表示里程计参考坐标系 -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot_odom">
+
+    <xacro:macro name="odom_link" params="parent xyz mass">
+        <link name="odom_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder length="0.005" radius="0.03" />
+                </geometry>
+                <material name="yellow">
+                    <color rgba="1.0 1.0 0.0 0.9" />
+                </material>
+            </visual>
+            <!-- 注意：odom 是虚拟坐标系标记，不添加 collision，避免参与物理碰撞 -->
+            <xacro:cylinder_inertia m="${mass}" r="0.03" h="0.005" />
+        </link>
+        <joint name="odom_joint" type="fixed">
+            <parent link="${parent}" />
+            <child link="odom_link" />
+            <origin xyz="${xyz}" />
+        </joint>
+    </xacro:macro>
+
+</robot>

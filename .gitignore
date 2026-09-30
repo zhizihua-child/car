@@ -1,0 +1,13 @@
+# colcon 构建产物
+TestRobot/build/
+TestRobot/install/
+TestRobot/log/
+
+# Python
+__pycache__/
+*.pyc
+
+# 历史备份（world / model 的快照）
+*.bak
+*.bak2
+*.bak_*

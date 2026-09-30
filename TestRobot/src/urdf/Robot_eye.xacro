@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- 眼睛（摄像头）模块：只定义宏，由总装配文件引用调用 -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot_eye">
+
+    <xacro:macro name="eye_link" params="parent xyz mass">
+        <link name="eye_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="0.04 0.03 0.02" />
+                </geometry>
+                <material name="black">
+                    <color rgba="0.0 0.0 0.0 0.9" />
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="0.04 0.03 0.02" />
+                </geometry>
+            </collision>
+            <xacro:box_inertia m="${mass}" w="0.04" d="0.03" h="0.02" />
+        </link>
+        <joint name="eye_joint" type="fixed">
+            <parent link="${parent}" />
+            <child link="eye_link" />
+            <origin xyz="${xyz}" />
+        </joint>
+    </xacro:macro>
+
+</robot>

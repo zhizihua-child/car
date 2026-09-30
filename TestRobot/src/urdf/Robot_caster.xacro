@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+  万向轮（caster）模块：球体支撑，防止两轮小车前后倾倒
+  - 球心放在 z=-0.076（半径 0.016 → 底部正好在 z=-0.092，与轮子接地高度一致）
+  - Gazebo 里把摩擦设为 0，让它只是"滑"着走，不阻碍转向
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot_caster">
+
+    <xacro:macro name="caster_link" params="caster_name xyz mass">
+        <link name="${caster_name}_caster_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <sphere radius="0.016" />
+                </geometry>
+                <material name="black">
+                    <color rgba="0.0 0.0 0.0 0.8" />
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <sphere radius="0.016" />
+                </geometry>
+            </collision>
+            <xacro:sphere_inertia m="${mass}" r="0.016" />
+        </link>
+
+        <!-- Gazebo：零摩擦，避免万向轮拖住车身 -->
+        <gazebo reference="${caster_name}_caster_link">
+            <mu1 value="0.0" />
+            <mu2 value="0.0" />
+            <kp value="1000000000.0" />
+            <kd value="1.0" />
+        </gazebo>
+
+        <joint name="${caster_name}_caster_joint" type="fixed">
+            <parent link="base_link" />
+            <child link="${caster_name}_caster_link" />
+            <origin xyz="${xyz}" />
+        </joint>
+    </xacro:macro>
+
+</robot>

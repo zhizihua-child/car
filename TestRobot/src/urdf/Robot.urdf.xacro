@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!-- 总装配文件：include 各模块（只含宏定义），再传参调用宏，拼出一台完整机器人 -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot">
+
+    <!-- 惯量计算宏（必须先引入，各模块的 macro 里会调用它） -->
+    <xacro:include filename="common_inertia.xacro" />
+
+    <!-- Gazebo 插件（差速驱动、关节状态、颜色） -->
+    <xacro:include filename="plugins/gazebo_control_plugin.xacro" />
+
+    <!-- 引入各模块（相对路径，基于本文件所在目录） -->
+    <xacro:include filename="Robot_body.xacro" />
+    <xacro:include filename="Robot_eye.xacro" />
+    <xacro:include filename="Robot_left_wheel.xacro" />
+    <xacro:include filename="Robot_right_wheek.xacro" />
+    <xacro:include filename="Robot_S.xacro" />
+    <xacro:include filename="Robot_caster.xacro" />
+    <xacro:include filename="Robot_laser.xacro" />
+
+    <!-- 身体：圆柱底盘 length=0.12m，radius=0.10m，mass=1.0kg -->
+    <xacro:body_link length="0.12" radius="0.10" mass="1.0" />
+
+    <!-- 眼睛（摄像头）：装在底盘正前方 -->
+    <xacro:eye_link parent="base_link" xyz="0.10 0 0.02" mass="0.02" />
+
+    <!-- 左右轮：装在底盘两侧底部 -->
+    <xacro:left_wheel_link parent="base_link"
+                           xyz="0 0.10 -0.06"
+                           radius="0.032" length="0.04" mass="0.1" />
+    <xacro:right_wheel_link parent="base_link"
+                            xyz="0 -0.10 -0.06"
+                            radius="0.032" length="0.04" mass="0.1" />
+
+    <!-- 里程计：放在地面位置（底盘底部以下，与轮子接地高度一致） -->
+    <xacro:odom_link parent="base_link" xyz="0 0 -0.06" mass="0.01" />
+
+    <!-- 前后万向轮：防止两轮小车前后倾倒 -->
+    <xacro:caster_link caster_name="front" xyz="0.08 0 -0.076" mass="0.01" />
+    <xacro:caster_link caster_name="back" xyz="-0.08 0 -0.076" mass="0.01" />
+
+    <!-- 2D 激光雷达：装在车体顶部 -->
+    <xacro:laser_link parent="base_link" xyz="0 0 0.08" mass="0.02" />
+
+    <!-- Gazebo 插件：差速驱动 + 关节状态 + 颜色 -->
+    <xacro:gazebo_control_plugin />
+
+</robot>

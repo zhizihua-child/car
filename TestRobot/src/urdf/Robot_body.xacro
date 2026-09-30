@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- 身体模块：只定义宏，由总装配文件 Robot.urdf.xacro 引用调用 -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot_body">
+
+    <!-- 底盘：圆柱，参数化 length / radius / mass -->
+    <xacro:macro name="body_link" params="length radius mass">
+        <link name="base_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder length="${length}" radius="${radius}" />
+                </geometry>
+                <material name="blue">
+                    <color rgba="0.1 0.1 1.0 0.5" />
+                </material>
+            </visual>
+            <!-- 碰撞体：与 visual 用同一份几何参数，注意不能写 material -->
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder length="${length}" radius="${radius}" />
+                </geometry>
+            </collision>
+            <xacro:cylinder_inertia m="${mass}" r="${radius}" h="${length}" />
+        </link>
+    </xacro:macro>
+
+</robot>

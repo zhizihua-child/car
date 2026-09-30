@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!-- 左轮模块：圆柱横放（绕 x 转 90°），continuous 关节绕 y 轴转动 -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot_left_wheel">
+
+    <xacro:macro name="left_wheel_link" params="parent xyz radius length mass">
+        <link name="left_wheel_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="1.57079 0 0" />
+                <geometry>
+                    <cylinder length="${length}" radius="${radius}" />
+                </geometry>
+                <material name="gray">
+                    <color rgba="0.3 0.3 0.3 1.0" />
+                </material>
+            </visual>
+            <!-- 碰撞体：位姿和几何与 visual 一致 -->
+            <collision>
+                <origin xyz="0 0 0" rpy="1.57079 0 0" />
+                <geometry>
+                    <cylinder length="${length}" radius="${radius}" />
+                </geometry>
+            </collision>
+            <!-- 惯量坐标系同样绕 x 转 90°，让圆柱轴对齐 link 的 y 轴 -->
+            <xacro:cylinder_inertia m="${mass}" r="${radius}" h="${length}"
+                                    rpy="1.57079 0 0" />
+        </link>
+        <joint name="left_wheel_joint" type="continuous">
+            <parent link="${parent}" />
+            <child link="left_wheel_link" />
+            <origin xyz="${xyz}" />
+            <axis xyz="0 1 0" />
+        </joint>
+    </xacro:macro>
+
+</robot>
