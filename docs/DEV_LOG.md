@@ -246,7 +246,13 @@
 - 决策（用户选择）：在 `/home/yfc/test_ros/logo_ros` 初始化 git 并首次提交；不添加远程、不 push。
 - 执行命令：`git init` → `git add -A` → `git status --short` 核对 → `git commit`。
 - 核对点：不包含 `TestRobot/{build,install,log}`、`__pycache__`、`*.bak*`；`chap3/4/6` 不在本仓库内。
-- 结果/证据：（待填 hash 与文件统计）
+- 结果/证据：
+  - `git init` 于 `/home/yfc/test_ros/logo_ros`，分支 `main`；首次提交 `60c1782`（43 个文件）。
+  - 远程 `origin` = `git@github.com:zhizihua-child/car.git`，`git push -u origin main` 成功。
+  - 认证：本机生成 ed25519 密钥（私钥仅在 `~/.ssh/id_ed25519`，公钥已加入 GitHub），
+    `~/.ssh/config` 配置 `github.com` 经 Clash 代理 `127.0.0.1:7897`；本仓库另配了
+    `http.proxy/https.proxy`（HTTPS 通道备用）。
+  - 仓库地址：https://github.com/zhizihua-child/car
 - 审查机制（用户要求）：新增到 `docs/PHASES.md` —— 每阶段由用户目视确认关键现象并在本日志签字，
   自动测试只作数值验证，不代替目视结论。
 - 待用户审查项（阶段 4）：
