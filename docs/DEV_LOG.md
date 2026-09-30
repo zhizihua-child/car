@@ -299,6 +299,23 @@
   `check_topics` 全部 OK（含 `map->odom`）；激光-地图对齐 5 次采样 **100%**（±1 格容差）。
 - 证据：`/tmp/opencode/default_world_check3.txt`。
 
+## 2026-09-30  顺序到点运行脚本 + README 使用说明重写
+
+- 新增：
+  - `src/scripts/run_points.py`：顺序导航到多个固定点（Gazebo+导航已启动时运行）。
+    点列表写在文件顶部 `POINTS`（map 坐标 x,y,朝向度），加行即可；也支持命令行
+    `"X,Y[,YAW]" ...` 覆盖与 `--timeout 秒`。输出每点状态/耗时/到点误差，结束时统计
+    到达数与碰撞事件数（TF 断链时回退 `/odom` 并标注）。
+  - `src/scripts/run_points.sh`：bash 版（内部调用 `send_nav_goal.py`，同样可编辑点列表）。
+  - `clean_all.sh` 增强：跳过调用链上的祖先进程，修复「外层 shell 命令行恰好含
+    amcl/nav2 等关键词被 pkill 误杀」的问题。
+  - 新增 `docs/evidence/`（运行证据截图/录屏存放目录）。
+- README：重写为对标考核的**使用说明**：验收指标表、环境依赖、目录结构、机器人话题/TF、
+  快速开始、按考核顺序的完整流程（清理→启动→建图→保存→定位→导航→到点）、
+  `run_points.py` 用法与加点方式、自检脚本表、参数调整、FAQ、提交材料/证据清单、第三方说明。
+- 测试说明：按用户要求，本轮脚本由用户自行测试；同类的 4 点顺序导航此前实测
+  4/4、0 碰撞、无 TF 异常（见八边形选型一节）。
+
 ## 2026-09-30  阶段 5：GitHub 提交准备（git init + 首次提交）
 
 - 决策（用户选择）：在 `/home/yfc/test_ros/logo_ros` 初始化 git 并首次提交；不添加远程、不 push。

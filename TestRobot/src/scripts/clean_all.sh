@@ -13,14 +13,39 @@ PATTERNS=(
   '[v]elocity_smoother' '[c]ollision_monitor' '[r]viz2'
   '[t]eleop_twist' '[s]pawn_entity'
 )
+
+# 收集调用者的祖先 PID，避免误杀"命令行里恰好包含关键词"的外层 shell
+ancestors=" $$ "
+pid=$$
+for _ in $(seq 1 8); do
+  pid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
+  [ -z "$pid" ] || [ "$pid" = "0" ] || [ "$pid" = "1" ] && break
+  ancestors="$ancestors$pid "
+done
+
+kill_pattern() {
+  local pat=$1
+  for pid in $(pgrep -f "$pat" 2>/dev/null); do
+    case "$ancestors" in
+      *" $pid "*) continue ;;   # 跳过调用链上的进程（含当前 shell）
+    esac
+    kill -9 "$pid" 2>/dev/null || true
+  done
+}
+
 echo "清理残留进程..."
 for p in "${PATTERNS[@]}"; do
-  pkill -9 -f "$p" 2>/dev/null || true
+  kill_pattern "$p"
 done
 sleep 3
-left=$(pgrep -af '[g]zserver|[r]obot_state_publisher|[a]mcl|[c]ontroller_server|[p]lanner_server|[b]t_navigator' || true)
+left=""
+for pid in $(pgrep -f '[g]zserver|[r]obot_state_publisher|[a]mcl|[c]ontroller_server|[p]lanner_server|[b]t_navigator' 2>/dev/null); do
+  case "$ancestors" in *" $pid "*) continue ;; esac
+  left="$left$(ps -o args= -p "$pid" 2>/dev/null)
+"
+done
 if [ -n "$left" ]; then
-  echo "仍有残留："; echo "$left"
+  echo "仍有残留："; printf '%s' "$left"
 else
   echo "已清理干净"
 fi
