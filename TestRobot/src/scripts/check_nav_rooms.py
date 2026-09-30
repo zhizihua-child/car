@@ -12,6 +12,7 @@ import time
 
 import rclpy
 from gazebo_msgs.msg import ContactsState
+from nav_msgs.msg import Odometry
 from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionClient
 from rclpy.node import Node
@@ -30,6 +31,10 @@ class RoomNavTest(Node):
         self.buf = Buffer()
         self.listener = TransformListener(self.buf, self)
         self.create_subscription(ContactsState, 'bumper_states', self.on_bump, 10)
+        # /odom 在本仿真中即世界坐标：TF 断链时用它作为终点位置的兜底读数
+        self.create_subscription(Odometry, 'odom', self.on_odom, 10)
+        self.odom_xy = None
+        self.tf_ok = True
         self.timeout = timeout
         self.collisions = 0
         self.in_contact = False
@@ -43,12 +48,20 @@ class RoomNavTest(Node):
             print(f'  [碰撞事件 #{self.collisions}]', flush=True)
         self.in_contact = has
 
+    def on_odom(self, msg):
+        self.odom_xy = (msg.pose.pose.position.x, msg.pose.pose.position.y)
+
     def pose(self):
+        """优先 TF map->base_link；失败则回退 /odom（世界坐标）并标注 TF 失效。"""
         try:
             tf = self.buf.lookup_transform('map', 'base_link', rclpy.time.Time())
-            return tf.transform.translation.x, tf.transform.translation.y
+            self.tf_ok = True
+            return tf.transform.translation.x, tf.transform.translation.y, ''
         except Exception:  # noqa: BLE001
-            return None
+            self.tf_ok = False
+            if self.odom_xy is not None:
+                return self.odom_xy[0], self.odom_xy[1], ' (TF失效，用/odom)'
+            return None, None, ''
 
     def send(self, x, y):
         if not self.client.wait_for_server(timeout_sec=15.0):
@@ -81,10 +94,10 @@ class RoomNavTest(Node):
             return False
         status = rf.result().status
         line = f'目标 ({x:.2f},{y:.2f}): status={status} 耗时={el:.1f}s'
-        p = self.pose()
-        if p is not None:
-            line += (f' 终点=({p[0]:.2f},{p[1]:.2f}) '
-                     f'位置误差={math.hypot(x-p[0], y-p[1]):.3f}m')
+        px, py, note = self.pose()
+        if px is not None:
+            line += (f' 终点=({px:.2f},{py:.2f}){note} '
+                     f'位置误差={math.hypot(x-px, y-py):.3f}m')
         print(line, flush=True)
         return status == SUCCEEDED
 

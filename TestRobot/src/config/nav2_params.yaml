@@ -97,7 +97,7 @@ controller_server:
       max_lookahead_dist: 0.5
       lookahead_time: 1.0
       rotate_to_heading_angular_vel: 0.8
-      transform_tolerance: 0.2
+      transform_tolerance: 0.5
       use_velocity_scaled_lookahead_dist: false
       min_approach_linear_velocity: 0.05
       approach_velocity_scaling_dist: 0.6
@@ -158,7 +158,7 @@ behavior_server:
       plugin: "nav2_behaviors/Wait"
     global_frame: odom
     robot_base_frame: base_link
-    transform_tolerance: 0.1
+    transform_tolerance: 0.5
     simulate_ahead_time: 2.0
     max_rotational_vel: 0.8
     min_rotational_vel: 0.4
@@ -202,7 +202,8 @@ local_costmap:
       width: 4
       height: 4
       resolution: 0.05
-      # 实际足迹：车体半径0.10 + 两侧驱动轮外缘约0.12，取 0.25x0.25 方形保守包络
+      # 容忍 map->odom 短暂延迟（AMCL 发布周期/瞬时抖动），避免误报 too old
+      transform_tolerance: 1.0
       footprint: "[[0.125, 0.125], [0.125, -0.125], [-0.125, -0.125], [-0.125, 0.125]]"
       plugins: ["obstacle_layer", "inflation_layer"]
       obstacle_layer:
@@ -238,6 +239,7 @@ global_costmap:
       footprint: "[[0.125, 0.125], [0.125, -0.125], [-0.125, -0.125], [-0.125, 0.125]]"
       resolution: 0.05
       track_unknown_space: true
+      transform_tolerance: 1.0
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"

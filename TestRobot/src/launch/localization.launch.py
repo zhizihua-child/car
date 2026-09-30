@@ -19,8 +19,23 @@ def _find_default_map():
     return ''
 
 
+
+# world 默认值：src/worlds/ 下排序第一个 .world（可用 world:= 覆盖）
+WORLDS_DIR = os.path.join(SRC_DIR, 'worlds')
+
+
+def _find_default_world():
+    if os.path.isdir(WORLDS_DIR):
+        worlds = sorted(f for f in os.listdir(WORLDS_DIR) if f.endswith('.world'))
+        if worlds:
+            return os.path.join(WORLDS_DIR, worlds[0])
+    return '/usr/share/gazebo-11/worlds/empty.world'
+
 def generate_launch_description():
     declare_gui = launch.actions.DeclareLaunchArgument('gui', default_value='true')
+    declare_world = launch.actions.DeclareLaunchArgument(
+        'world', default_value=_find_default_world(),
+        description='world 文件路径；默认 src/worlds/ 下第一个 .world')
     declare_rviz = launch.actions.DeclareLaunchArgument('rviz', default_value='true')
     declare_map = launch.actions.DeclareLaunchArgument(
         'map', default_value=_find_default_map(),
@@ -29,7 +44,9 @@ def generate_launch_description():
     # 1. Gazebo 场景 + 机器人
     gazebo = launch.actions.IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(SRC_DIR, 'launch', 'gazebo.launch.py')),
-        launch_arguments=[('gui', launch.substitutions.LaunchConfiguration('gui'))])
+        launch_arguments=[
+            ('gui', launch.substitutions.LaunchConfiguration('gui')),
+            ('world', launch.substitutions.LaunchConfiguration('world'))])
 
     # 2. 地图服务 + AMCL 定位（nav2_bringup 官方 launch）
     localization = launch.actions.IncludeLaunchDescription(
@@ -52,6 +69,7 @@ def generate_launch_description():
 
     return launch.LaunchDescription([
         declare_gui,
+        declare_world,
         declare_rviz,
         declare_map,
         gazebo,

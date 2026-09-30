@@ -55,10 +55,11 @@ src/
 │   ├── check_alignment.py      # 自检（测试桩）：激光端点与地图重合度
 │   ├── send_nav_goal.py        # 自检（测试桩）：发目标点并报告到点误差
 │   ├── check_nav_rooms.py      # 自检（测试桩）：多目标导航 + 碰撞事件计数
-│   └── drive_waypoints.py      # 自检（测试桩）：按路点自动行驶（建图覆盖/验证）
+│   ├── drive_waypoints.py      # 自检（测试桩）：按路点自动行驶（建图覆盖/验证）
+│   └── clean_all.sh            # 一键清理残留进程（启动任何流程前建议执行）
 ├── urdf/                       # 机器人模型（模块化 xacro）
-├── models/mine_world/          # 自定义场景模型
-├── worlds/mine.world           # 仿真世界
+├── models/mine_world/          # 旧房子场景模型（历史保留，当前 world 未引用）
+├── worlds/octagon.world        # 仿真世界：八边形围墙 + 十字形 4 圆柱
 └── maps/                       # 保存的地图（.pgm + .yaml）
 ```
 
@@ -80,8 +81,12 @@ src/
 
 ```bash
 cd ~/test_ros/logo_ros/TestRobot
-./run_gazebo.sh              # 先清理残留 Gazebo，再启动场景+机器人
+./run_gazebo.sh              # 内置全量清理（gz/slam/nav2 残留），再启动场景+机器人
 ```
+
+> 启动建图/定位/导航前同样建议先执行 `bash src/scripts/clean_all.sh`：
+> 残留的 amcl/nav2 节点会用旧时钟发布 TF，表现为 `map->odom` 冻结、
+> `Transform data too old`、到点误差异常等（本工程曾多次踩坑）。
 
 手动遥控（另开终端）：
 
@@ -148,6 +153,9 @@ ros2 lifecycle get /controller_server
 ## 六、自检脚本（测试桩）
 
 ```bash
+# 0) 启动任何流程前：清理 gz/slam/nav2 残留进程（独立进程模式下残留节点会用旧时钟污染 TF）
+bash src/scripts/clean_all.sh
+
 # 1) 仿真/建图/定位/导航运行中：检查 /scan、/odom、TF 链（通过退出码 0）
 bash src/scripts/check_topics.sh
 
@@ -174,7 +182,7 @@ python3 src/scripts/check_nav_rooms.py X,Y X,Y ... [--timeout 秒]
 | 最大速度 | `config/nav2_params.yaml` | `FollowPath.desired_linear_vel` |
 | 机器人半径 | `config/nav2_params.yaml` | 代价地图 `robot_radius` |
 | 建图分辨率 | `config/slam_params.yaml` | `resolution` |
-| 墙高 / 场景 | `worlds/mine.world` | 场景模型内 |
+| 墙高 / 场景 | `worlds/octagon.world` | 墙 `box` 高度 / 圆柱参数 |
 
 ## 八、本工程编写与集成说明
 

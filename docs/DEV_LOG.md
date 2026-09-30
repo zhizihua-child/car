@@ -264,6 +264,41 @@
   - 新增 `src/scripts/check_nav_rooms.py`（房间多目标导航+碰撞计数测试桩）。
   - 证据：`/tmp/opencode/cyl_loc_result3.txt`、`/tmp/opencode/cyl_nav_result.txt`、`/tmp/opencode/remap_cyl_result2.txt`。
 
+## 2026-09-30  新 world（八边形）测试与选型（用户要求：用时最短者为最终 world）
+
+- 新增 `src/worlds/octagon.world`：八边形围墙（外接半径 4.5m，中心=出生点 `(-2.8,-0.5)`）
+  + 内部十字形 4 个圆柱（半径 0.25m、高 0.5m，距中心 1.8m，四色区分）。
+- 测试结果：
+  - 八边形自动建图（绕中心 2.8m 一圈，不旋转）：行驶 **239s**，地图 177×177、
+    自由 53.20 m²、四圆柱均入图。
+  - 八边形导航（4 个对角目标，GUI，`clean_all.sh` 先清残留）：
+    **4/4 成功、0 碰撞**，耗时 14.1/35.3/21.1/23.0 s（合计 **93.5s**），
+    误差 0.068~0.161m；AMCL 全程存活、无 `Transform data too old`。
+  - 房子地图（圆柱版）对照：4/4、0 碰撞，耗时合计 117.2s，误差 0.100~0.151m；
+    且曾因残留 Nav2 进程出现 TF 假死。
+  - 结论：**八边形用时最短且更稳定 → 选为最终 world**。
+- 关键修复（本轮一并完成）：
+  - 新增 `src/scripts/clean_all.sh`：独立进程模式下完整清理 gz/nav2/slam 残留
+    （此前残留节点用旧时钟发布 TF，是多次假死的根因）。
+  - `check_nav_rooms.py`：TF 断链时回退 `/odom` 世界坐标并标注 `(TF失效，用/odom)`，避免"假误差"。
+  - mapping/localization/navigation launch 支持 `world:=` 参数透传。
+- 目录调整：`mine.world` 与房子地图移存 `world_backup/mine_cylinder_world/`；
+  `map_octagon.*` 更名为 `src/maps/map.*`（最终地图）。
+- 证据：`/tmp/opencode/oct_diag_result.txt`、`/tmp/opencode/octagon_map_result.txt`、
+  `/tmp/opencode/cyl_nav_result.txt`。
+
+## 2026-09-30  最终默认流程复验（八边形）与残留进程根治
+
+- 问题 1：地图改名后 `src/maps/map.yaml` 的 `image` 字段仍为 `map_octagon.pgm` → map_server 加载失败。
+  修复：改为 `image: map.pgm`。
+- 问题 2（残留进程第二次实锤）：上一轮 localization 的独立进程（amcl/map_server/lifecycle_manager）
+  未清理，新实例重名冲突无法激活 → `map->odom` 缺失、对齐无采样。
+  修复：`run_gazebo.sh` 改为调用 `src/scripts/clean_all.sh`（全量清理 gz/slam/nav2 独立进程）；
+  README/AGENTS 写明「启动任何流程前先执行 clean_all.sh」。
+- 复验（默认 world=`octagon.world`、默认 map=`src/maps/map.yaml`，不带任何参数）：
+  `check_topics` 全部 OK（含 `map->odom`）；激光-地图对齐 5 次采样 **100%**（±1 格容差）。
+- 证据：`/tmp/opencode/default_world_check3.txt`。
+
 ## 2026-09-30  阶段 5：GitHub 提交准备（git init + 首次提交）
 
 - 决策（用户选择）：在 `/home/yfc/test_ros/logo_ros` 初始化 git 并首次提交；不添加远程、不 push。

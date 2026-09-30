@@ -12,10 +12,14 @@ set -e
 
 WS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "[1/3] 清理残留 Gazebo 进程..."
-pkill -f gzclient 2>/dev/null || true
-pkill -f gzserver 2>/dev/null || true
-sleep 2
+echo "[1/3] 清理残留仿真/导航进程（含 slam/nav2 独立进程）..."
+if [ -x "$WS_DIR/src/scripts/clean_all.sh" ]; then
+    bash "$WS_DIR/src/scripts/clean_all.sh" || true
+else
+    pkill -f gzclient 2>/dev/null || true
+    pkill -f gzserver 2>/dev/null || true
+    sleep 2
+fi
 
 if ss -tln 2>/dev/null | grep -q ':11345 '; then
     echo "错误: 端口 11345 仍被占用，请检查："

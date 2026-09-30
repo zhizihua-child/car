@@ -27,10 +27,11 @@ ROS 2 Humble + Gazebo Classic 11 移动机器人仿真项目（建图 / 定位 /
 - 出生点 `gazebo.launch.py` 默认 `x=-2.8 y=-0.5 z=0.2` 必须与 `config/nav2_params.yaml` 中 AMCL 的 `initial_pose` 一致（Gazebo 里程计从出生点世界坐标起算）。改一处必须同步另一处。
 - 到点阈值在 `config/nav2_params.yaml` 的 `general_goal_checker`：`xy_goal_tolerance: 0.2`（要求 ≤0.25m）、`yaw_goal_tolerance: 0.26` rad（≈14.9°，要求 ≤15°）。
 - `map_server.yaml_filename` 是占位符，实际地图由 nav2_bringup launch 的 `map` 参数覆盖，不要在那里硬编码路径。
-- 场景模型依赖 `GAZEBO_MODEL_PATH`（launch 已设置）：`src/models` + `/usr/share/gazebo-11/models` + `~/.gazebo/models`。缺模型报错先查这三个目录（`number1..9`、`cafe_table`、`bookshelf` 在 `~/.gazebo/models`）。
+- 当前默认（也是唯一）world 是 `src/worlds/octagon.world`（八边形围墙 + 十字形 4 圆柱，中心即出生点）；旧的房子世界与地图备份在 `world_backup/mine_cylinder_world/`。场景仅依赖 Gazebo 自带 `sun`/`ground_plane`（`GAZEBO_MODEL_PATH` 已含 `/usr/share/gazebo-11/models`）。
 - 当前 URDF 无 IMU、无 world→base_link TF；根目录 `frames_*.gv/pdf` 是旧 TF 快照（含 `imu_link`），不要当现状依据。
 - 旧练习残留的 `robot_state_publisher`（`first_robot` 模型）会往 TF 里混入 `imu_link` 等无关帧；排查 TF 异常前先 `pkill -f '[r]obot_state_publisher'`（方括号防止 pkill 匹配到当前命令行而杀掉自己）。
 - `world_backup/`、`src/worlds/*.bak*`、`src/models/*.bak*` 是历史快照，编辑时不要改错文件。
+- 启动 mapping/localization/navigation 前先 `bash src/scripts/clean_all.sh`（`run_gazebo.sh` 已内置）。独立进程模式下残留的 amcl/map_server/planner 等会与本实例重名并用旧时钟发布 TF，表现为 `map->odom` 冻结、`Transform data too old`、定位假死、到点误差假大。诊断脚本命名不要含 `amcl` 等关键词（clean_all.sh 的 pkill 会误杀同名命令行）。
 - `colcon test` 只跑 ament lint，没有功能性测试；功能验证只能靠实际启动 + 话题/TF/RViz/动作结果检查。
 
 ## 开发规范（用户要求）
