@@ -1539,25 +1539,24 @@
       <link name='link'>
         <visual name='visual'>
           <geometry>
-            <mesh>
-              <uri>model://number1/meshes/number.dae</uri>
-              <scale>0.5 0.5 0.5</scale>
-            </mesh>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
           </geometry>
           <material>
             <script>
-              <uri>model://number1/materials/scripts</uri>
-              <uri>model://number1/materials/textures</uri>
-              <name>Number/One</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
             </script>
           </material>
         </visual>
         <collision name='collision'>
           <geometry>
-            <mesh>
-              <uri>model://number1/meshes/number.dae</uri>
-              <scale>0.5 0.5 0.5</scale>
-            </mesh>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
           </geometry>
         </collision>
         <self_collide>0</self_collide>
@@ -1571,25 +1570,24 @@
       <link name='link'>
         <visual name='visual'>
           <geometry>
-            <mesh>
-              <uri>model://number1/meshes/number.dae</uri>
-              <scale>0.5 0.5 0.5</scale>
-            </mesh>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
           </geometry>
           <material>
             <script>
-              <uri>model://number2/materials/scripts</uri>
-              <uri>model://number2/materials/textures</uri>
-              <name>Number/Two</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Blue</name>
             </script>
           </material>
         </visual>
         <collision name='collision'>
           <geometry>
-            <mesh>
-              <uri>model://number1/meshes/number.dae</uri>
-              <scale>0.5 0.5 0.5</scale>
-            </mesh>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
           </geometry>
         </collision>
         <self_collide>0</self_collide>
@@ -1603,25 +1601,24 @@
       <link name='link'>
         <visual name='visual'>
           <geometry>
-            <mesh>
-              <uri>model://number1/meshes/number.dae</uri>
-              <scale>0.5 0.5 0.5</scale>
-            </mesh>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
           </geometry>
           <material>
             <script>
-              <uri>model://number3/materials/scripts</uri>
-              <uri>model://number3/materials/textures</uri>
-              <name>Number/Three</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
             </script>
           </material>
         </visual>
         <collision name='collision'>
           <geometry>
-            <mesh>
-              <uri>model://number1/meshes/number.dae</uri>
-              <scale>0.5 0.5 0.5</scale>
-            </mesh>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
           </geometry>
         </collision>
         <self_collide>0</self_collide>
@@ -1635,25 +1632,24 @@
       <link name='link'>
         <visual name='visual'>
           <geometry>
-            <mesh>
-              <uri>model://number1/meshes/number.dae</uri>
-              <scale>0.5 0.5 0.5</scale>
-            </mesh>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
           </geometry>
           <material>
             <script>
-              <uri>model://number4/materials/scripts</uri>
-              <uri>model://number4/materials/textures</uri>
-              <name>Number/Four</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Yellow</name>
             </script>
           </material>
         </visual>
         <collision name='collision'>
           <geometry>
-            <mesh>
-              <uri>model://number1/meshes/number.dae</uri>
-              <scale>0.5 0.5 0.5</scale>
-            </mesh>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
           </geometry>
         </collision>
         <self_collide>0</self_collide>

@@ -82,11 +82,19 @@ class AlignmentChecker(Node):
             if not (0 <= c < info.width and 0 <= rr < info.height):
                 out += 1
                 continue
-            v = self.grid.data[rr * info.width + c]
-            if v < 0:
-                unknown += 1
-            elif v >= OCCUPIED:
+            # ±1 格（5cm）容差：地图墙体常被建图压成 1 格，端点允许落在
+            # 占据格及其 8 邻域内都算命中（与目视"基本重合"判定一致）
+            hit = False
+            for dr in (-1, 0, 1):
+                for dc in (-1, 0, 1):
+                    cc, rrn = c + dc, rr + dr
+                    if 0 <= cc < info.width and 0 <= rrn < info.height:
+                        if self.grid.data[rrn * info.width + cc] >= OCCUPIED:
+                            hit = True
+            if hit:
                 occ += 1
+            elif self.grid.data[rr * info.width + c] < 0:
+                unknown += 1
             else:
                 free += 1
         total = occ + free

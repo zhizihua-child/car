@@ -139,6 +139,24 @@
             </sensor>
         </gazebo>
 
+        <!-- ===== 碰撞检测（验收要求「全程碰撞次数少于 2 次」的客观依据） =====
+             发布话题：/bumper_states（gazebo_msgs/ContactsState）
+             仅统计车体（base_link_collision）的接触，不含轮子/万向轮与地面的正常接触 -->
+        <gazebo reference="base_link">
+            <sensor name="bumper" type="contact">
+                <update_rate>20</update_rate>
+                <contact>
+                    <collision>base_link_collision</collision>
+                </contact>
+                <plugin name="bumper_controller" filename="libgazebo_ros_bumper.so">
+                    <ros>
+                        <namespace>/</namespace>
+                    </ros>
+                    <frame_name>base_link</frame_name>
+                </plugin>
+            </sensor>
+        </gazebo>
+
     </xacro:macro>
 
 </robot>

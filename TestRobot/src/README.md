@@ -54,6 +54,7 @@ src/
 │   ├── check_topics.sh         # 自检（测试桩）：话题与 TF 链
 │   ├── check_alignment.py      # 自检（测试桩）：激光端点与地图重合度
 │   ├── send_nav_goal.py        # 自检（测试桩）：发目标点并报告到点误差
+│   ├── check_nav_rooms.py      # 自检（测试桩）：多目标导航 + 碰撞事件计数
 │   └── drive_waypoints.py      # 自检（测试桩）：按路点自动行驶（建图覆盖/验证）
 ├── urdf/                       # 机器人模型（模块化 xacro）
 ├── models/mine_world/          # 自定义场景模型
@@ -70,6 +71,7 @@ src/
 | 里程计 | `/odom`（nav_msgs/Odometry）+ TF `odom → base_link` |
 | 激光雷达 | `/scan`（sensor_msgs/LaserScan），360°，10Hz，0.12~8m |
 | 摄像头（可选）| `/camera/image_raw`、`/camera/camera_info`，640×480，30Hz |
+| 碰撞检测（验收自检）| `/bumper_states`（gazebo_msgs/ContactsState），base_link 接触传感器 |
 | 坐标系 | `map → odom → base_link → laser_link/...` |
 
 ## 四、使用流程
@@ -157,6 +159,9 @@ python3 src/scripts/send_nav_goal.py X Y [YAW_DEG]
 
 # 4) 建图运行中：按给定路点（map 坐标）自动行驶，前向激光保护（到达全部路点退出码 0）
 python3 src/scripts/drive_waypoints.py X,Y X,Y ... [--no-spin] [--verbose]
+
+# 5) 导航运行中：依次发多个目标点并统计成功/误差/碰撞事件（全部到达且碰撞<2 退出码 0）
+python3 src/scripts/check_nav_rooms.py X,Y X,Y ... [--timeout 秒]
 ```
 
 开发阶段与验收步骤见 `../../docs/PHASES.md`，改动记录见 `../../docs/DEV_LOG.md`。
